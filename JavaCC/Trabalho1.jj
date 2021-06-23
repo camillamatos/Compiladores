@@ -1,0 +1,137 @@
+options {
+ static = false;
+}
+
+PARSER_BEGIN(Trabalho1)
+
+import java.io.FileInputStream;
+import java.io.File;
+import java.io.IOException;
+
+public class Trabalho1 {
+	public static void main(String args []) throws ParseException {
+ 		try {
+ 			System.out.println("Lendo arquivo fonte...");
+ 			FileInputStream fis = new FileInputStream(new File("..//JavaCC//src//fonte.txt"));
+ 			Trabalho1 parser = new Trabalho1(fis);
+ 			parser.parse();
+			System.out.println("Arquivo fonte processado corretamente!");
+ 		} catch (IOException e) {
+ 			System.out.println("Falha ao abrir arquivo fonte.");
+ 			System.exit(0);
+ 		}
+ 	}
+}
+
+PARSER_END(Trabalho1)
+
+//caracteres nao considerados:
+SKIP : { " "| "\n" | "\r" | "\t" }
+
+//final da linha:
+TOKEN : { < FDL : ";" >  }
+
+TOKEN : { < #LETRA: ["a" - "z", "A" - "Z"] > }
+
+TOKEN : { < #DIGITO: ["0" - "9"] > }
+
+//comentário em linha:
+TOKEN: { < COMENTARIO_LINHA : "/c/" (~["\n", "\r"])* ("\n" | "\r" | "\r\n") > }
+
+
+//comentário em bloco:
+TOKEN: { < COMENTARIO_BLOCO : "/c*" ( ~["*", "c", "/"])* "*c/" > }
+
+//tipos de variáveis:
+TOKEN : {
+	< TIPO: (< NUMERO > | < CARACTERE > | < BOLEANO >) > |
+	< #NUMERO : "number" > |
+	< #CARACTERE : "string" > |
+	< #BOLEANO : "boolean" >
+}
+
+//valores do boleano:
+TOKEN : { < VF : (< VERDADEIRO > | < FALSO > ) > | < #VERDADEIRO: "true" > | < #FALSO : "false" > }
+
+//nomes de variáveis (obrigatoriamente devem começar com um caracter):
+TOKEN : { < LITERAIS : < LETRA >(< LETRA > | < DIGITO > | "_")* > }
+
+//valores em formato string, que devem estar dentro de aspas:
+TOKEN: { < VALORES_CARACTERE: "\"" < LETRA >(< LETRA > | < DIGITO > | "_" | " ")* "\"" > }
+
+//valores em formato number, que podem ter 1 ou vários números:
+TOKEN: { < VALORES_DIGITO: < DIGITO >(< DIGITO >)* > }
+
+//operadores relacionais:
+TOKEN: { < OPERADOR_RELACIONAL: (">" | "<" | "==" | "!=") > }
+
+//operadores aritméticos:
+TOKEN: { < OPERADOR_ARITMETICO: ("+" | "-" | "*" | "/") > }
+
+//operadores para abrir e fechar parenteses e chaves:
+TOKEN : { < AC: "{" >  }
+TOKEN : { < FC: "}" >  }
+TOKEN : { < AP: "(" >  }
+TOKEN : { < FP: ")" >  }
+
+void parse(): {} { (comandos()) < EOF > }
+
+//todos os comandos que podem haver na linguagem:
+void comandos(): {} {
+ 	(comentario() | identificador() | atribuicao() | enquanto() | leitura() | escrita() | se() | ternario() | facaenquanto() | funcao() | escolha() | comando_inovador())*
+}
+
+// comentario que pode ser em uma linha ou em bloco
+void comentario(): {} {	(< COMENTARIO_LINHA > | < COMENTARIO_BLOCO >) }
+
+//repetição do identificador sem inicialização:
+void identificador_repeticao (): {} { (< LITERAIS > | ","identificador_repeticao())+ }
+
+//repetição do identificador com inicialização:
+void identificador_inicializacao (): {} { valor()(","< LITERAIS >"=" valor())* }
+
+//identificador que precisa começar com um tipo, seguido do nome da variável:
+void identificador(): {} {	< TIPO >< LITERAIS >(","identificador_repeticao() | "=" identificador_inicializacao())*< FDL > }
+
+//atribuição de uma variável:
+void atribuicao(): {} {	< LITERAIS >"=" (calculo() | < VALORES_CARACTERE >) < FDL > }
+
+//valor de uma variável, que pode ser string, number ou boolean:
+void valor(): {} { (< VALORES_DIGITO > | < VALORES_CARACTERE > | < VF >) }
+
+//termo, que pode ser um número ou uma variável:
+void termo(): {} { (< VALORES_DIGITO > | < LITERAIS >) }
+
+//calculo utilizando numeros ou variáveis:
+void calculo(): {} { (termo() (< OPERADOR_ARITMETICO > termo())*)+ }
+
+//condição que utiliza o calculo e operadores relacionais:
+void condicao(): {} { calculo() < OPERADOR_RELACIONAL > calculo() }
+
+//comando de leitura que lê o valor para uma variável:
+void leitura(): {} { "read " < LITERAIS > < FDL > }
+
+//comando de escrita que escreve um valor:
+void escrita(): {} { "write " valor() < FDL > }
+
+//comando enquanto, que executa um comando enquanto uma condição for verdadeira:
+void enquanto(): {} { "while " condicao() < AC > comandos() < FC > }
+
+//condicional se, que necessita uma condição e comandos. Pode ter um else também:
+void se(): {} { "if " condicao() < AC > comandos() < FC > ("else " < AC > comandos() < FC >)?}
+
+//condicional ternário, que recebe uma condição e retorna um valor:
+void ternario(): {} { "ternary " condicao() ": " valor() "! " valor() < FDL > }
+
+//repetição faça enquanto, que realiza comandos enquanto uma condição for verdadeira:
+void facaenquanto(): {} { "do " < AC > comandos() < FC > "while "condicao() < FDL > }
+
+//função que pode ou não receber parametros, retornando comandos:
+void funcao(): {} { "function " < LITERAIS > < AP > (identificador_repeticao())? < FP >  < AC > comandos() < FC > }
+
+//condicional switch, que recebe uma variável e verifica seus possível casos, retornando algum comando. No final, é obrigatório possuir um nocase, sendo que o break é opcional:
+void escolha(): {} { "switch " < LITERAIS > < AC > ("case " termo()":" comandos() ("break;")?)+ "nocase:" comandos() ("break;")? < FC > }
+
+//repetição condicional com intervalo de tempo
+void comando_inovador(): {} { "innovative " condicao() < AC > comandos() < FC >  < VALORES_DIGITO >}
+

@@ -1,0 +1,97 @@
+l = letras [a-z]
+d = digitos [0-9]
+s = espaço
+e = enter
+
+COMANDO: COMENTARIO | IDENTIFICADOR | ATRIBUICAO | ENQUANTO | LEITURA | ESCRITA | SE | TERNARIO | FACAENQUANTO | FUNCAO | ESCOLHA | INOVADOR
+
+COMENTARIO
+1) S -> /c A
+2) A -> *B | /C
+3) B -> lB | dB | sB | eB | *c/D
+4) C -> lC | dC | sC | eD
+5) D -> ε
+
+IDENTIFICADOR
+1) S -> lA
+2) A -> lA | dA | sB
+3) B -> lC
+4) C -> lC | dC | sD
+5) D -> ;E | =F | ,B
+6) E -> ε
+7) F -> lF | dF | ,B | ;E
+
+ATRIBUIÇÃO
+1) S -> lA
+2) A -> lA | dA | sB
+3) B -> = C
+4) C -> lC | dC | sC | ;D
+5) D -> ε
+
+CONDIÇÃO
+1) S -> lS | dS | sA
+2) A -> > B | < B | == B | != B 
+3) B -> lB | dB | ε
+
+ENQUANTO
+1) S -> while CONDIÇÃO {A
+2) A -> COMANDO A | } B
+3) B -> ε
+
+LEITURA
+1) S -> read lA
+2) A -> lA | dA | ;B
+3) B -> ε
+
+ESCRITA
+1) S -> write A
+2) A -> lA | dA | ;B
+3) B -> ε
+
+SE
+1) S -> if CONDIÇÃO {A
+2) A -> COMANDO A | }B
+3) B -> D | }else{ C
+4) C -> COMANDO C | }D
+5) D -> ε
+
+TERNARIO
+1) S -> ternary CONDIÇÃO :A
+2) A -> lA | dA | !B
+3) B -> lB | dB | ;C
+4) C -> ε
+
+FACAENQUANTO
+1) S -> do{ A
+2) A -> COMANDO A | } B
+3) B -> while CONDIÇÃO ;C
+4) C -> ε
+
+FUNCAO 
+1) S -> function lA
+2) A -> lA | dA | (B
+3) B -> lC | ){ E
+4) C -> lC | dC | ,D | ){ E
+5) D -> lC | dC 
+6) E -> COMANDO E | F
+7) F -> } G
+7) G -> ε
+
+ESCOLHA
+1) S -> switch lA
+2) A -> lA | dA | { B
+3) B -> case C
+4) C -> lC | dC | :D
+5) D -> COMANDO D | E
+6) E -> break; F | F
+7) F -> B | nocase: G
+8) G -> COMANDO G | break; }H
+9) H -> ε
+
+INOVADOR
+1) S -> innovative CONDIÇÃO {A
+2) A -> COMANDO A | } dB
+3) B -> dB | ε
+
+
+

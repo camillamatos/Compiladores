@@ -1,0 +1,72 @@
+/c*
+COMENTARIO
+EM 
+BLOCO
+*c/
+
+/c/ COMENTARIO EM LINHA
+
+string palavra = "palavra";
+number valor = 2;
+string teste2;
+string palavra2, palavra3;
+
+while valor > 0 {
+	write "ola mundo";
+}
+
+valor2 = 2 + 1;
+valor2 = 2;
+teste2 = "ola";
+palavra = teste2;
+
+read teste;
+
+if 2 > 0 {
+	write "valor positivo";
+}
+
+if 2 > 0 {
+	write "valor positivo";
+} else {
+	write "valor negativo";
+}
+
+ternary 2 > 0 : true ! false;
+
+do {
+ write "ola";
+} while 2 > 0;
+
+function funcao1(){
+	write "ola";
+}
+
+function funcao2(valor){
+	if valor > 0 {
+		write "valor positivo";
+	} else {
+		write "valor negativo";
+	}
+}
+
+function funcao2(valor, valor2){
+	write "ola";
+}
+
+switch variavel {
+	case 1:
+		read teste;
+		write "caso1";
+		break;
+	case 2:
+		write "caso2";
+		break;
+	nocase:
+		write "nenhum";
+		break;
+}
+
+innovative 2 > 1 {
+	write "execucao a cada 1 segundo";
+} 1
